@@ -20,9 +20,10 @@ import {
 
 export const MobilePage = () => {
   const { data: confessions } = useGetConfessionsAPIQuery();
+  const [showNote, setShowNote] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [post, setPost] = useState<IPostConfession | null>(null);
-  const [postConfession, { isLoading }] = usePostConfessionMutation();
+  const [postConfession, { isLoading, isError }] = usePostConfessionMutation();
   const [currIndex, setCurrIndex] = useState(0);
   const INTERVAL_TIME = 7500;
   const [gender, setGender] = useState<"גבר" | "אישה" | null>();
@@ -51,13 +52,22 @@ export const MobilePage = () => {
   };
 
   const handlePost = async () => {
-    const validPost = isValidToPost();
-    if (!validPost) return;
+    if (!isValidToPost()) {
+      setShowNote(true);
+      return;
+    }
+
+    const confessionToPost: IPostConfession = {
+      confession: confession,
+      age: age ?? 20,
+      sex: gender === "אישה" ? "female" : "male",
+      category: detectCategoryFromConfession(confession),
+    };
 
     try {
-      await postConfession(validPost).unwrap();
-      setPost(validPost);
-      setIsModalOpen(true);
+      await postConfession(confessionToPost).unwrap();
+      setPost(confessionToPost);
+      setIsModalOpen(false);
       resetData();
     } catch (e) {
       console.log("❌ Error posting confession: ", e);
@@ -210,7 +220,7 @@ export const MobilePage = () => {
             }}
           >
             <Button
-              disabled={!isValidToPost()}
+              // disabled={!isValidToPost()}
               onClick={handlePost}
               className={`post-button-mobile ${!isValidToPost() ? "disabled" : ""}`}
             >
@@ -220,6 +230,18 @@ export const MobilePage = () => {
                 "שתף"
               )}
             </Button>
+          </div>
+          <div style={{ display: "flex", width: "100%", justifyContent: "center", paddingBottom: "25px", }}>
+            {isError && (
+              <span style={{ marginTop: "12px", fontSize: "16px" }}>
+                * אירעה תקלה בשיתוף הוידוי, אנא נסה.י שוב / נסה.י מאוחר יותר :)
+              </span>
+            )}
+            {showNote && (
+              <span style={{ marginTop: "12px", fontSize: "16px" }}>
+                * חסרים כמה פרטים, כולם ממלאים את זה :)
+              </span>
+            )}
           </div>
         </div>
       </div>

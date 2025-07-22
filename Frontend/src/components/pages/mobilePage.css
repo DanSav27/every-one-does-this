@@ -10,7 +10,6 @@
   padding: 20px;
   font-size: 16px;
   font-family: "Rubik", sans-serif;
-  overflow-y: auto;
 }
 
 .mobile-animation-wrapper {
@@ -173,7 +172,7 @@
   padding: 3px 65px !important;
   width: 99% !important;
   transition: background-color 0.3s ease, color 0.3s ease !important;
-  margin-bottom: 40px !important;
+  margin-bottom: 12px !important;
 }
 
 .post-button-mobile.disabled {
