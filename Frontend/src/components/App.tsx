@@ -16,8 +16,8 @@ export const App = () => {
         <CssBaseline />
         <BrowserRouter>
           <Routes>
-            {/* <Route path={String(CONFIG_API.MAIN_PAGE)} element={<MainPage />} /> */}
-            {/* <Route
+            {/* <Route path={String(CONFIG_API.MAIN_PAGE)} element={<MainPage />} />
+            <Route
               path={String(CONFIG_API.CONTROL_PAGE)}
               element={<ControlPage />}
             /> */}

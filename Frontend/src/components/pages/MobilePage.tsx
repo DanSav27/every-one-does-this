@@ -56,7 +56,8 @@ export const MobilePage = () => {
       setShowNote(true);
       return;
     }
-
+    setShowNote(false);
+    
     const confessionToPost: IPostConfession = {
       confession: confession,
       age: age ?? 20,
@@ -67,7 +68,7 @@ export const MobilePage = () => {
     try {
       await postConfession(confessionToPost).unwrap();
       setPost(confessionToPost);
-      setIsModalOpen(false);
+      setIsModalOpen(true);
       resetData();
     } catch (e) {
       console.log("❌ Error posting confession: ", e);
