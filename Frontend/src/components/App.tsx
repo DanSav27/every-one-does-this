@@ -1,13 +1,13 @@
 import "./app.css";
 import React from "react";
-// import { CONFIG_API } from "../configs";
-// import { ControlPage } from "./pages/ControlPage";
-// import { MainPage } from "./pages/MainPage";
+import { CONFIG_API } from "../configs";
+import { ControlPage } from "./pages/ControlPage";
+import { MainPage } from "./pages/MainPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import theme from "../theme";
-import { MobilePage } from "./pages/MobilePage";
+// import { MobilePage } from "./pages/MobilePage";
 
 export const App = () => {
   return (
@@ -16,15 +16,19 @@ export const App = () => {
         <CssBaseline />
         <BrowserRouter>
           <Routes>
-            {/* <Route path={String(CONFIG_API.MAIN_PAGE)} element={<MainPage />} />
+            <Route
+              path={'/'}
+              element={<MainPage />}
+            />
+            <Route path={String(CONFIG_API.MAIN_PAGE)} element={<MainPage />} />
             <Route
               path={String(CONFIG_API.CONTROL_PAGE)}
               element={<ControlPage />}
-            /> */}
-            <Route
+            />
+            {/* <Route
               path={'/'}
               element={<MobilePage />}
-            />
+            /> */}
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

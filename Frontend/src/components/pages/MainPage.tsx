@@ -7,7 +7,14 @@ import {
   IPostConfession,
 } from "../../interfaces/interfaces";
 import { useGetConfessionsAPIQuery } from "../../redux/slices/tablesSlice";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Confession } from "../confessions/Confession";
 import { SUBCATEGORY_KEYWORDS } from "../../interfaces/subCategories";
 import { motion, AnimatePresence } from "framer-motion";
@@ -111,7 +118,8 @@ export const MainPage = () => {
 
   const getAmountOfCategory = useCallback(
     (category: ECATEGORIES) =>
-      confessions?.filter((conf) => conf.category === category).length,
+      confessions?.filter((conf: IConfession) => conf.category === category)
+        .length,
     [confessions]
   );
 
@@ -121,7 +129,7 @@ export const MainPage = () => {
       const subCat = getSubCategory(target.confession);
       if (!subCat) return { list: [], amount: 0 };
       const list = confessions.filter(
-        (conf) =>
+        (conf: IConfession) =>
           conf.category === target.category &&
           getSubCategory(conf.confession) === subCat &&
           ("id" in target ? conf.id !== target.id : true)
@@ -173,14 +181,14 @@ export const MainPage = () => {
         conf.age <= 20
           ? "1-20"
           : conf.age <= 30
-            ? "21-30"
-            : conf.age <= 40
-              ? "31-40"
-              : conf.age <= 50
-                ? "41-50"
-                : conf.age <= 60
-                  ? "51-60"
-                  : "61+";
+          ? "21-30"
+          : conf.age <= 40
+          ? "31-40"
+          : conf.age <= 50
+          ? "41-50"
+          : conf.age <= 60
+          ? "51-60"
+          : "61+";
       (acc[group] ||= []).push(conf);
       return acc;
     }, {});
@@ -188,7 +196,7 @@ export const MainPage = () => {
 
   const getGroupByGender = useCallback(
     (gender: "male" | "female") =>
-      confessions?.filter((conf) => conf.sex === gender),
+      confessions?.filter((conf: IConfession) => conf.sex === gender),
     [confessions]
   );
 
@@ -205,7 +213,9 @@ export const MainPage = () => {
     const length = confessions?.length;
     if (!length || length === 0) return 0;
 
-    return Math.round(length / 32);
+    return Math.round(
+      length / Number(import.meta.env.VITE_LINES || 40)
+    );
   }, [confessions?.length]);
 
   const groupConfessionsByRows = useMemo(() => {
@@ -220,7 +230,7 @@ export const MainPage = () => {
   const getNewestConfession = useCallback((): IConfession | null => {
     if (!confessions || confessions.length === 0) return null;
 
-    return confessions.reduce((latest, current) => {
+    return confessions.reduce((latest: IConfession, current: IConfession) => {
       const latestTime = new Date(latest.created_at).getTime();
       const currentTime = new Date(current.created_at).getTime();
       return currentTime > latestTime ? current : latest;
@@ -279,12 +289,13 @@ export const MainPage = () => {
           <motion.div
             key={`${display ?? "default"}-${currCategory ?? "all"}-layout`}
             transition={{ duration: MOTION_TIME, ease: "easeInOut" }}
-            className={`main-page-content ${display ?? "default"} ${currCategory ? "category" : ""
-              }`}
+            className={`main-page-content ${display ?? "default"} ${
+              currCategory ? "category" : ""
+            }`}
           >
             {(!display || display === EDISPLAYES.TIME) && (
               <>
-                {display && display === EDISPLAYES.TIME &&
+                {display && display === EDISPLAYES.TIME && (
                   <motion.span
                     key="time-view-label"
                     initial={{ opacity: 0, x: 30 }}
@@ -299,7 +310,8 @@ export const MainPage = () => {
                     }}
                   >
                     מהוידוי החדש ביותר לישן ביותר
-                  </motion.span>}
+                  </motion.span>
+                )}
                 {display === EDISPLAYES.TIME ? (
                   displayedConfessions?.map((conf) => {
                     const isOpen = openedConf === conf.id;
@@ -326,7 +338,9 @@ export const MainPage = () => {
                             ) ?? false
                           }
                           isHidden={
-                            !currCategory ? false : currCategory !== conf.category
+                            !currCategory
+                              ? false
+                              : currCategory !== conf.category
                           }
                           isColumn={display === EDISPLAYES.TIME}
                           hideAlikes={!!display}
@@ -345,11 +359,12 @@ export const MainPage = () => {
                     {groupConfessionsByRows.map((row, rowIndex) => (
                       <motion.div
                         key={rowIndex}
-                        className={`confessions-row ${currCategory ? "categorized" : ""
-                          }`}
+                        className={`confessions-row ${
+                          currCategory ? "categorized" : ""
+                        }`}
                         layout
                         transition={{
-                          duration: MOTION_TIME
+                          duration: MOTION_TIME,
                         }}
                       >
                         {row.map((conf) => {
@@ -360,17 +375,23 @@ export const MainPage = () => {
                             toPresent && (
                               <motion.div
                                 layout
-                                layoutId={!currCategory ? `confession-${conf.id}` : `${currCategory}`}
+                                layoutId={
+                                  !currCategory
+                                    ? `confession-${conf.id}`
+                                    : `${currCategory}`
+                                }
                                 key={conf.id}
                                 transition={{
                                   duration: MOTION_TIME,
                                   ease: "easeInOut",
                                 }}
-                                className={`confession-container ${isOpen ? "expanded" : ""
-                                  } ${currCategory === conf.category
+                                className={`confession-container ${
+                                  isOpen ? "expanded" : ""
+                                } ${
+                                  currCategory === conf.category
                                     ? "categorized"
                                     : ""
-                                  }`}
+                                }`}
                                 initial={{ opacity: 0, x: 0 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 0 }}
@@ -390,7 +411,9 @@ export const MainPage = () => {
                                   }
                                   isColumn={display === EDISPLAYES.TIME}
                                   hideAlikes={!!display}
-                                  amountAlikes={getAlikeConfessions(conf).amount}
+                                  amountAlikes={
+                                    getAlikeConfessions(conf).amount
+                                  }
                                   amountFromSameCategory={getAmountOfCategory(
                                     conf.category
                                   )}
@@ -408,14 +431,10 @@ export const MainPage = () => {
               </>
             )}
             <>
-              {
-                display === EDISPLAYES.AGE &&
+              {display === EDISPLAYES.AGE &&
                 Object.entries(groupConfessionsByAge(displayedConfessions)).map(
                   ([groupLabel, groupConfs]) => (
-                    <motion.div
-                      key={groupLabel}
-                      className="age-group-wrapper"
-                    >
+                    <motion.div key={groupLabel} className="age-group-wrapper">
                       <motion.div
                         layout
                         layoutId={`group-${groupLabel}`}
@@ -445,9 +464,9 @@ export const MainPage = () => {
                                   ease: "easeInOut",
                                 }}
                                 className="confession-container"
-                                initial={{ opacity: 0, x: 0, }}
-                                animate={{ opacity: 1, x: 0, }}
-                                exit={{ opacity: 0, x: 0, }}
+                                initial={{ opacity: 0, x: 0 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 0 }}
                               >
                                 <Confession
                                   confession={conf}
@@ -463,7 +482,9 @@ export const MainPage = () => {
                                       : currCategory !== conf.category
                                   }
                                   hideAlikes={!!display}
-                                  amountAlikes={getAlikeConfessions(conf).amount}
+                                  amountAlikes={
+                                    getAlikeConfessions(conf).amount
+                                  }
                                   amountFromSameCategory={getAmountOfCategory(
                                     conf.category
                                   )}
@@ -487,9 +508,9 @@ export const MainPage = () => {
                                     ease: "easeInOut",
                                   }}
                                   className="confession-container"
-                                  initial={{ opacity: 0, x: 0, }}
-                                  animate={{ opacity: 1, x: 0, }}
-                                  exit={{ opacity: 0, x: 0, }}
+                                  initial={{ opacity: 0, x: 0 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  exit={{ opacity: 0, x: 0 }}
                                 >
                                   <Confession
                                     confession={conf}
@@ -505,7 +526,9 @@ export const MainPage = () => {
                                         : currCategory !== conf.category
                                     }
                                     hideAlikes={!!display}
-                                    amountAlikes={getAlikeConfessions(conf).amount}
+                                    amountAlikes={
+                                      getAlikeConfessions(conf).amount
+                                    }
                                     amountFromSameCategory={getAmountOfCategory(
                                       conf.category
                                     )}
@@ -525,21 +548,30 @@ export const MainPage = () => {
             {display === EDISPLAYES.GENDER && (
               <>
                 {GENDERS.map((gender) => {
-                  const genderConfs = getGroupByGender(gender === "male" ? "male" : "female") || [];
-                  const rows: IConfession[][] = Array.from({ length: LINES_IN_GENDER_HALF }, () => []);
-                  genderConfs.forEach((conf, i) => {
+                  const genderConfs =
+                    getGroupByGender(gender === "male" ? "male" : "female") ||
+                    [];
+                  const rows: IConfession[][] = Array.from(
+                    { length: LINES_IN_GENDER_HALF },
+                    () => []
+                  );
+                  genderConfs.forEach((conf: IConfession, i: number) => {
                     rows[i % LINES_IN_GENDER_HALF].push(conf);
-                  })
+                  });
                   return (
                     <div
                       key={gender}
-                      className={`gender-half-wrapper ${gender === "male" ? "left" : ""
-                        }`}
+                      className={`gender-half-wrapper ${
+                        gender === "male" ? "left" : ""
+                      }`}
                     >
                       <motion.div
                         key={gender}
                         layout
-                        transition={{ duration: MOTION_TIME, ease: "easeInOut" }}
+                        transition={{
+                          duration: MOTION_TIME,
+                          ease: "easeInOut",
+                        }}
                         className="confession-container"
                         initial={{ opacity: 0, x: 5 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -550,8 +582,9 @@ export const MainPage = () => {
                         )}
                       </motion.div>
                       <div
-                        className={`gender-half ${gender === "female" ? "right" : "left"
-                          }`}
+                        className={`gender-half ${
+                          gender === "female" ? "right" : "left"
+                        }`}
                       >
                         {rows.map((row, rowIdx) => (
                           <div key={rowIdx} className="confession-row-gender">
@@ -585,7 +618,9 @@ export const MainPage = () => {
                                         : currCategory !== conf.category
                                     }
                                     hideAlikes={!!display}
-                                    amountAlikes={getAlikeConfessions(conf).amount}
+                                    amountAlikes={
+                                      getAlikeConfessions(conf).amount
+                                    }
                                     amountFromSameCategory={getAmountOfCategory(
                                       conf.category
                                     )}
@@ -593,15 +628,17 @@ export const MainPage = () => {
                                     onOpenAlikes={handleOpenAlikes}
                                   />
                                 </motion.div>
-
-                              )
+                              );
                             })}
                           </div>
                         ))}
                       </div>
                       <motion.div
                         layout
-                        transition={{ duration: MOTION_TIME, ease: "easeInOut" }}
+                        transition={{
+                          duration: MOTION_TIME,
+                          ease: "easeInOut",
+                        }}
                         className="confession-container"
                         initial={{ opacity: 0, x: 0 }}
                         animate={{ opacity: 1, x: 0 }}
